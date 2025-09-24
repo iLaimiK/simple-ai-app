@@ -48,6 +48,8 @@ export default [
         },
       ],
       "linebreak-style": ["error", "unix"],
+      'newline-per-chained-call': ['error', { ignoreChainWithDepth: 1 }],
+      'dot-location': ['error', 'property'],
 
       // 代码质量相关规则
       "no-console": "off",
@@ -65,8 +67,8 @@ export default [
 
       // TS特定规则
       "@typescript-eslint/explicit-function-return-type": "off",
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/consistent-type-definitions": ["error", "interface"],
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/consistent-type-definitions": ["error", "type"],
       "@typescript-eslint/no-empty-interface": "error",
       "@typescript-eslint/prefer-optional-chain": "error",
     },

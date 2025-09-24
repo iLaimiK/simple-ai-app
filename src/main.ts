@@ -57,13 +57,41 @@ while (true) {
   });
 
   // 调用 API 传入历史所有消息
-  const reply = await invoke(messages);
+  const response = await stream(messages);
+  const decoder = new TextDecoder();
+
+  let reply = '';
+
+  process.stdout.write('Assistant：');
+
+  for await (const value of response) {
+    const lines = decoder
+      .decode(value, { stream: true })
+      .split('\n')
+      .map((chunk) => chunk.trim())
+      .filter(Boolean);
+
+    for (const line of lines) {
+      if (line === 'data: [DONE]') {
+        break;
+      }
+
+      const json = JSON.parse(line.slice('data: '.length));
+      const chunk = json.choices[0].delta.content || '';
+
+      // 打印模型回复
+      process.stdout.write(chunk);
+      reply += chunk;
+    }
+  }
+
+  process.stdout.write('\n\n');
+
   // 保存本次模型回复
   messages.push({
     role: 'assistant',
     content: reply
   });
-  console.log(`Assistant：${reply}` + '\n');
 }
 
 /**
@@ -86,7 +114,7 @@ async function readInput() {
 /**
  * 调用模型 API 获取回复
  */
-async function invoke(messages: Message[]) {
+async function stream(messages: Message[]) {
   const res = await fetch(`${BASE_URL}/chat/completions`, {
     method: 'POST',
     headers: {
@@ -95,10 +123,14 @@ async function invoke(messages: Message[]) {
     },
     body: JSON.stringify({
       model: MODEL,
-      messages: messages
+      messages: messages,
+      stream: true
     })
   });
 
-  const data = await res.json() as any;
-  return data.choices[0].message.content as string;
+  if (!res.body) {
+    throw new Error('Failed to get response from API.');
+  }
+
+  return res.body;
 }
