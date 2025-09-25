@@ -10,6 +10,7 @@
 
 ```bash
 pnpm install
+pnpm start
 ```
 
 ## 模型服务和 API key 说明
