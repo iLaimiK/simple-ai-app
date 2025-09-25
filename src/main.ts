@@ -131,9 +131,13 @@ async function* stream(messages: Message[]) {
       }
 
       const json = JSON.parse(line.slice('data: '.length));
-      const chunk = json.choices[0].delta.content || '';
-
-      yield chunk as string;
+      // 确保 choices 数组存在且有内容
+      if (json.choices && json.choices.length > 0 && json.choices[0].delta) {
+        const chunk = json.choices[0].delta.content || '';
+        if (chunk) {
+          yield chunk as string;
+        }
+      }
     }
   }
 }
