@@ -57,32 +57,16 @@ while (true) {
   });
 
   // 调用 API 传入历史所有消息
-  const response = await stream(messages);
-  const decoder = new TextDecoder();
+  const chunks = stream(messages);
 
   let reply = '';
 
   process.stdout.write('Assistant：');
 
-  for await (const value of response) {
-    const lines = decoder
-      .decode(value, { stream: true })
-      .split('\n')
-      .map((chunk) => chunk.trim())
-      .filter(Boolean);
-
-    for (const line of lines) {
-      if (line === 'data: [DONE]') {
-        break;
-      }
-
-      const json = JSON.parse(line.slice('data: '.length));
-      const chunk = json.choices[0].delta.content || '';
-
-      // 打印模型回复
-      process.stdout.write(chunk);
-      reply += chunk;
-    }
+  for await (const chunk of chunks) {
+    // 打印模型回复
+    process.stdout.write(chunk);
+    reply += chunk;
   }
 
   process.stdout.write('\n\n');
@@ -114,7 +98,7 @@ async function readInput() {
 /**
  * 调用模型 API 获取回复
  */
-async function stream(messages: Message[]) {
+async function* stream(messages: Message[]) {
   const res = await fetch(`${BASE_URL}/chat/completions`, {
     method: 'POST',
     headers: {
@@ -132,5 +116,24 @@ async function stream(messages: Message[]) {
     throw new Error('Failed to get response from API.');
   }
 
-  return res.body;
+  const decoder = new TextDecoder();
+
+  for await (const value of res.body) {
+    const lines = decoder
+      .decode(value, { stream: true })
+      .split('\n')
+      .map((chunk) => chunk.trim())
+      .filter(Boolean);
+
+    for (const line of lines) {
+      if (line === 'data: [DONE]') {
+        break;
+      }
+
+      const json = JSON.parse(line.slice('data: '.length));
+      const chunk = json.choices[0].delta.content || '';
+
+      yield chunk as string;
+    }
+  }
 }
