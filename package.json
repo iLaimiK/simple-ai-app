@@ -24,6 +24,7 @@
   "keywords": [],
   "devDependencies": {
     "@eslint/js": "^9.36.0",
+    "@types/express": "^5.0.3",
     "@types/node": "^24.5.2",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
@@ -43,8 +44,12 @@
     "@langchain/core": "^0.3.77",
     "@langchain/openai": "^0.6.13",
     "dotenv": "^17.2.2",
+    "express": "^5.1.0",
     "langchain": "^0.3.34",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

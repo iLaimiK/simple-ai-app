@@ -1,11 +1,11 @@
 /**
  * 消息格式
- * @deprecated 使用 LangChian 内部的 Message 类，而非手动定义
+ * 使用 LangChian 内部的 Message 类，而非手动定义
  */
-export type Message = {
-  role: 'user' | 'assistant' | 'system',
-  content: string,
-};
+// export type Message = {
+//   role: 'user' | 'assistant' | 'system',
+//   content: string,
+// };
 
 /**
  * 非流返回的数据格式
