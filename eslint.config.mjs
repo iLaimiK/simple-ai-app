@@ -1,30 +1,56 @@
-import tsPlugin from "@typescript-eslint/eslint-plugin";
-import tsParser from "@typescript-eslint/parser";
+import js from "@eslint/js";
+import reactHooks from "eslint-plugin-react-hooks";
+import reactRefresh from "eslint-plugin-react-refresh";
 import globals from "globals";
+import tsEslint from 'typescript-eslint';
 
 export default [
+  // 忽略文件配置
   {
-    files: ["**/*.ts", "**/*.tsx"],
+    ignores: [
+      "dist/",
+      "node_modules/",
+      "*.config.mjs",
+      "*.config.js"
+    ]
+  },
+
+  // JavaScript 文件配置
+  js.configs.recommended,
+
+  // TypeScript 文件配置
+  ...tsEslint.configs.recommended,
+
+  {
+    files: ["**/*.{ts,tsx}"],
     languageOptions: {
-      parser: tsParser,
       parserOptions: {
         ecmaVersion: "latest",
         sourceType: "module",
-        project: ["./tsconfig.json"],
+        projectService: true,
         tsconfigRootDir: import.meta.dirname,
       },
       globals: {
         ...globals.node,
         ...globals.es2021,
+        ...globals.browser
       },
     },
     plugins: {
-      "@typescript-eslint": tsPlugin,
+      "react-hooks": reactHooks,
+      "react-refresh": reactRefresh,
     },
     rules: {
-      ...tsPlugin.configs.recommended.rules,
+      // React Hooks 规则
+      ...reactHooks.configs.recommended.rules,
+
+      // React Refresh 规则
+      "react-refresh/only-export-components": [
+        "warn",
+        { allowConstantExport: true },
+      ],
+
       // 格式化相关规则
-      indent: ["error", 2],
       quotes: ["error", "single"],
       semi: ["error", "always"],
       "comma-dangle": ["error", "never"],
@@ -47,13 +73,13 @@ export default [
           ignoreComments: true, // 忽略注释
         },
       ],
-      "linebreak-style": ["error", "unix"],
-      'newline-per-chained-call': ['error', { ignoreChainWithDepth: 1 }],
+      "linebreak-style": "off", // Windows/Unix 兼容性
+      'newline-per-chained-call': ['error', { ignoreChainWithDepth: 2 }],
       'dot-location': ['error', 'property'],
 
       // 代码质量相关规则
       "no-console": "off",
-      "no-undef": "error",
+      "no-undef": "off", // TypeScript 处理
       "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": [
         "error",
@@ -72,13 +98,5 @@ export default [
       "@typescript-eslint/no-empty-interface": "error",
       "@typescript-eslint/prefer-optional-chain": "error",
     },
-
-    // 忽略特定文件的检查
-    ignores: [
-      "dist/", // 构建输出目录
-      "node_modules/", // 依赖包目录
-      "*.config.mjs",
-      "*.config.js", // 配置文件
-    ],
   },
 ];

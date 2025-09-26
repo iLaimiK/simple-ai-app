@@ -7,10 +7,14 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "start": "npx tsx src/main.ts",
+    "dev": "run-p dev:*",
+    "dev:ui": "vite",
+    "dev:server": "npx tsx --watch ./server/main.ts",
+    "build": "tsc -b && vite build",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
-    "prepare": "husky"
+    "prepare": "husky",
+    "preview": "vite preview"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": [
@@ -19,19 +23,28 @@
   },
   "keywords": [],
   "devDependencies": {
+    "@eslint/js": "^9.36.0",
     "@types/node": "^24.5.2",
-    "@typescript-eslint/eslint-plugin": "^8.44.1",
-    "@typescript-eslint/parser": "^8.44.1",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.3",
     "eslint": "^9.36.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.22",
     "globals": "^16.4.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.0",
-    "typescript": "^5.9.2"
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.44.1",
+    "vite": "^7.1.7"
   },
   "dependencies": {
     "@langchain/core": "^0.3.77",
     "@langchain/openai": "^0.6.13",
     "dotenv": "^17.2.2",
-    "langchain": "^0.3.34"
+    "langchain": "^0.3.34",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
   }
 }
