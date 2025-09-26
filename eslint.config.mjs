@@ -11,7 +11,8 @@ export default [
       "dist/",
       "node_modules/",
       "*.config.mjs",
-      "*.config.js"
+      "*.config.js",
+      "*.config.ts"
     ]
   },
 
