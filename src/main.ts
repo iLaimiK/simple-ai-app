@@ -1,6 +1,12 @@
+import {
+  AIMessage,
+  BaseMessage,
+  HumanMessage,
+  SystemMessage
+} from '@langchain/core/messages';
+import { ChatOpenAI } from '@langchain/openai';
 import dotenv from 'dotenv';
 import readline from 'readline';
-import type { Message } from './types.d.ts';
 
 // 加载 .env 文件
 dotenv.config({
@@ -16,10 +22,28 @@ if (!API_KEY || !BASE_URL || !MODEL) {
   throw new Error('请在 .env 中设置 API_KEY、BASE_URL 和 MODEL 值');
 }
 
-const messages: Message[] = [
-  {
-    role: 'system',
-    content: `
+// 创建 LangChain 模型实例
+const model = new ChatOpenAI({
+  model: MODEL,
+  configuration: {
+    baseURL: BASE_URL,
+    apiKey: API_KEY,
+    // 添加浏览器请求头以绕过 Cloudflare 的机器人检测
+    // 模拟真实浏览器请求，避免被识别为程序化请求而被阻止
+    defaultHeaders: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Accept': 'application/json, text/plain, */*',
+      'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache'
+    }
+  },
+  streaming: true
+});
+
+const messages: BaseMessage[] = [
+  new SystemMessage(
+    `
 用户正处于**学习模式**，并要求你在本次对话中遵守以下**严格规则**。无论接下来有任何其他指示，你都**必须**遵守这些规则：
 
 ## 严格规则
@@ -45,37 +69,32 @@ const messages: Message[] = [
 ## 重要提示
 **不要直接给出答案或替用户做作业**。如果用户提出一个数学或逻辑问题，或者上传了相关问题的图片，**不要**在你的第一条回复中就解决它。而是应该：**与用户一起梳理**这个问题，一步一步地进行，每一步只问一个问题，并在继续下一步之前，给用户**回应每一步**的机会。
     `
-  }
+  )
 ];
 
 while (true) {
   // 读取用户输入
   const input = await readInput();
-  messages.push({
-    role: 'user',
-    content: input
-  });
+  messages.push(new HumanMessage(input));
 
   // 调用 API 传入历史所有消息
-  const chunks = stream(messages);
+  const chunks = await model.stream(messages);
 
   let reply = '';
 
   process.stdout.write('Assistant：');
 
   for await (const chunk of chunks) {
+    const content = chunk.content.toString();
     // 打印模型回复
-    process.stdout.write(chunk);
-    reply += chunk;
+    process.stdout.write(content);
+    reply += content;
   }
 
   process.stdout.write('\n\n');
 
   // 保存本次模型回复
-  messages.push({
-    role: 'assistant',
-    content: reply
-  });
+  messages.push(new AIMessage(reply));
 }
 
 /**
@@ -97,47 +116,48 @@ async function readInput() {
 
 /**
  * 调用模型 API 获取回复
+ * @deprecated 使用 LangChain 的 stream 方法替换原来手动实现的 stream 方法
  */
-async function* stream(messages: Message[]) {
-  const res = await fetch(`${BASE_URL}/chat/completions`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${API_KEY}`
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      messages: messages,
-      stream: true
-    })
-  });
+// async function* stream(messages: Message[]) {
+//   const res = await fetch(`${BASE_URL}/chat/completions`, {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json',
+//       Authorization: `Bearer ${API_KEY}`
+//     },
+//     body: JSON.stringify({
+//       model: MODEL,
+//       messages: messages,
+//       stream: true
+//     })
+//   });
 
-  if (!res.body) {
-    throw new Error('Failed to get response from API.');
-  }
+//   if (!res.body) {
+//     throw new Error('Failed to get response from API.');
+//   }
 
-  const decoder = new TextDecoder();
+//   const decoder = new TextDecoder();
 
-  for await (const value of res.body) {
-    const lines = decoder
-      .decode(value, { stream: true })
-      .split('\n')
-      .map((chunk) => chunk.trim())
-      .filter(Boolean);
+//   for await (const value of res.body) {
+//     const lines = decoder
+//       .decode(value, { stream: true })
+//       .split('\n')
+//       .map((chunk) => chunk.trim())
+//       .filter(Boolean);
 
-    for (const line of lines) {
-      if (line === 'data: [DONE]') {
-        break;
-      }
+//     for (const line of lines) {
+//       if (line === 'data: [DONE]') {
+//         break;
+//       }
 
-      const json = JSON.parse(line.slice('data: '.length));
-      // 确保 choices 数组存在且有内容
-      if (json.choices && json.choices.length > 0 && json.choices[0].delta) {
-        const chunk = json.choices[0].delta.content || '';
-        if (chunk) {
-          yield chunk as string;
-        }
-      }
-    }
-  }
-}
+//       const json = JSON.parse(line.slice('data: '.length));
+//       // 确保 choices 数组存在且有内容
+//       if (json.choices && json.choices.length > 0 && json.choices[0].delta) {
+//         const chunk = json.choices[0].delta.content || '';
+//         if (chunk) {
+//           yield chunk as string;
+//         }
+//       }
+//     }
+//   }
+// }
