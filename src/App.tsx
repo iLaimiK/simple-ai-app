@@ -3,7 +3,7 @@ import { useKeyPress, useMount, useReactive } from 'ahooks';
 import { ArrowRightIcon, Loader2Icon, SquareIcon } from 'lucide-react';
 import { useRef } from 'react';
 import { MessageItem } from './components/MessageItem';
-import { sse } from './lib/sse';
+import { ssePost } from './lib/sse';
 import { cn } from './lib/utils';
 
 function App() {
@@ -61,12 +61,21 @@ function App() {
       abortController.current = new AbortController();
 
       // 创建 SSE 连接（EventSource)
-      const stream = await sse<ChatMessage>('/api/sse', {
+      // const stream = await sse<ChatMessage>('/api/sse', {
+      //   signal: abortController.current.signal,
+      //   params: {
+      //     query: state.input.trim()
+      //   }
+      // });
+
+      // 创建 SSE 链接（Fetch)
+      const stream = await ssePost<ChatMessage>('/api/sse', {
         signal: abortController.current.signal,
         params: {
           query: state.input.trim()
         }
       });
+
 
       state.messages.push({
         type: 'user',
