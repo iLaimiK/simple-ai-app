@@ -1,3 +1,4 @@
+import { FileSystemIconLoader } from "@iconify/utils/lib/loader/node-loaders";
 import {
   defineConfig,
   presetAttributify,
@@ -8,8 +9,6 @@ import {
   transformerDirectives,
   transformerVariantGroup,
 } from "unocss";
-
-import { FileSystemIconLoader } from "@iconify/utils/lib/loader/node-loaders";
 
 import fs from "fs";
 

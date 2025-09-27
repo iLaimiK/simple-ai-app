@@ -24,6 +24,7 @@
   "keywords": [],
   "devDependencies": {
     "@eslint/js": "^9.36.0",
+    "@iconify-json/lucide": "^1.2.68",
     "@iconify/utils": "^3.0.2",
     "@types/express": "^5.0.3",
     "@types/node": "^24.5.2",
@@ -47,9 +48,12 @@
     "@langchain/core": "^0.3.77",
     "@langchain/openai": "^0.6.13",
     "@unocss/reset": "^66.5.2",
+    "ahooks": "^3.9.5",
+    "clsx": "^2.1.1",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "langchain": "^0.3.34",
+    "lucide-react": "^0.544.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },

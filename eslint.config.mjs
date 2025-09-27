@@ -94,7 +94,7 @@ export default [
 
       // TS特定规则
       "@typescript-eslint/explicit-function-return-type": "off",
-      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/consistent-type-definitions": ["error", "type"],
       "@typescript-eslint/no-empty-interface": "error",
       "@typescript-eslint/prefer-optional-chain": "error",

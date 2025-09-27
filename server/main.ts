@@ -31,16 +31,16 @@ const model = new ChatOpenAI({
   model: MODEL,
   configuration: {
     baseURL: BASE_URL,
-    apiKey: API_KEY,
+    apiKey: API_KEY
     // 添加浏览器请求头以绕过 Cloudflare 的机器人检测
     // 模拟真实浏览器请求，避免被识别为程序化请求而被阻止
-    defaultHeaders: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      'Accept': 'application/json, text/plain, */*',
-      'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-      'Cache-Control': 'no-cache',
-      'Pragma': 'no-cache'
-    }
+    // defaultHeaders: {
+    //   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    //   'Accept': 'application/json, text/plain, */*',
+    //   'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+    //   'Cache-Control': 'no-cache',
+    //   'Pragma': 'no-cache'
+    // }
   },
   streaming: true
 });
