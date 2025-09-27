@@ -3,5 +3,5 @@ export type ChatMessage = {
   partial?: boolean;
   payload: {
     content: string;
-  }
-}
+  };
+};

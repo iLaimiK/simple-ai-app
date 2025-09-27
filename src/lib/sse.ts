@@ -39,7 +39,7 @@ export async function sse<T>(path: string, options: SSEOptions) {
       eventSource.close();
     };
 
-    eventSource.onmessage = (event) => {
+    eventSource.onmessage = event => {
       if (!event.data) return;
       try {
         resolvers?.resolve(JSON.parse(event.data));
@@ -88,7 +88,7 @@ export function ssePost<T>(path: string, options: SSEOptions) {
       body: JSON.stringify(params),
       signal
     })
-      .then(async(res) => {
+      .then(async res => {
         if (!res.ok) {
           const text = (await res.text()) || res.statusText;
           throw new Error(text);
@@ -97,7 +97,7 @@ export function ssePost<T>(path: string, options: SSEOptions) {
         resolve(generator());
         return res.body;
       })
-      .then(async(body) => {
+      .then(async body => {
         if (!body) {
           throw new Error('No body present');
         }
@@ -109,7 +109,7 @@ export function ssePost<T>(path: string, options: SSEOptions) {
           const lines = decoder
             .decode(chunk, { stream: true })
             .split('\n')
-            .map((line) => line.trim())
+            .map(line => line.trim())
             .filter(Boolean);
 
           for (const line of lines) {
@@ -139,7 +139,7 @@ export function ssePost<T>(path: string, options: SSEOptions) {
           }
         }
       })
-      .catch((err) => {
+      .catch(err => {
         resolvers?.reject(err);
         reject(err);
       });

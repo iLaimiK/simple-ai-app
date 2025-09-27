@@ -24,7 +24,7 @@ function App() {
   /**
    * 加载历史消息
    */
-  useMount(async() => {
+  useMount(async () => {
     const response = await fetch('/api/history');
     const messages = await response.json().catch(() => []);
     state.messages = messages;
@@ -76,7 +76,6 @@ function App() {
         }
       });
 
-
       state.messages.push({
         type: 'user',
         payload: {
@@ -116,21 +115,21 @@ function App() {
   return (
     <main className={cn('pb-28', isWelcome && 'flex h-screen flex-col justify-center')}>
       {/* 标题 */}
-      <section className="sticky left-0 top-0">
-        <h1 className="bg-background relative mx-auto p-4 text-3xl font-medium md:w-3xl">
+      <section className='sticky left-0 top-0'>
+        <h1 className='bg-background relative mx-auto p-4 text-3xl font-medium md:w-3xl'>
           {isWelcome ? '有什么需要帮忙的喵？' : 'Neko'}
         </h1>
       </section>
 
       {/* 聊天消息 */}
-      <section className="mx-auto flex w-full flex-col justify-between px-4 pb-6 leading-relaxed md:w-3xl">
-        <div className="flex flex-1 flex-col gap-4">
+      <section className='mx-auto flex w-full flex-col justify-between px-4 pb-6 leading-relaxed md:w-3xl'>
+        <div className='flex flex-1 flex-col gap-4'>
           {state.messages.map((message, index) => (
             <MessageItem key={index} message={message} />
           ))}
         </div>
 
-        {state.error && <div className="mt-4 rounded bg-red-50 p-4 py-3 text-sm text-red-500">{state.error}</div>}
+        {state.error && <div className='mt-4 rounded bg-red-50 p-4 py-3 text-sm text-red-500'>{state.error}</div>}
       </section>
 
       {/* 底部输入框 */}
@@ -140,15 +139,15 @@ function App() {
           isWelcome ? 'relative mx-auto' : 'fixed bottom-0 left-1/2 -translate-x-1/2'
         )}
       >
-        <div className="relative flex flex-col gap-2 rounded-xl border-2 pb-10 bg-background focus-within:border-primary">
+        <div className='relative flex flex-col gap-2 rounded-xl border-2 pb-10 bg-background focus-within:border-primary'>
           <input
             ref={input}
-            className="h-11 px-4 outline-none"
+            className='h-11 px-4 outline-none'
             autoFocus
             value={state.input}
-            onChange={(e) => (state.input = e.target.value)}
+            onChange={e => (state.input = e.target.value)}
             disabled={state.isConnecting || state.isReplying}
-            placeholder="在这里输入喵~"
+            placeholder='在这里输入喵~'
           />
           <div
             className={cn(
@@ -157,9 +156,9 @@ function App() {
             )}
             onClick={handleSend}
           >
-            {state.isConnecting && <Loader2Icon size={16} className="animate-spin" />}
+            {state.isConnecting && <Loader2Icon size={16} className='animate-spin' />}
             {state.isReplying && <SquareIcon size={16} />}
-            {!state.isConnecting && !state.isReplying && <ArrowRightIcon size={16} className="rotate--90" />}
+            {!state.isConnecting && !state.isReplying && <ArrowRightIcon size={16} className='rotate--90' />}
           </div>
         </div>
       </section>

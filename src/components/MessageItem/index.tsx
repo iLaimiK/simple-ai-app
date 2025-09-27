@@ -11,19 +11,8 @@ export function MessageItem(props: MessageItemProps) {
   const isUserMessage = message.type === 'user';
 
   return (
-    <div
-      className={cn(
-        'flex',
-        isUserMessage && 'justify-end'
-      )}
-    >
-      <p
-        className={cn(
-          isUserMessage && 'rounded-full bg-neutral-100 px-4 py-1.5'
-        )}
-      >
-        {message.payload.content}
-      </p>
+    <div className={cn('flex', isUserMessage && 'justify-end')}>
+      <p className={cn(isUserMessage && 'rounded-full bg-neutral-100 px-4 py-1.5')}>{message.payload.content}</p>
     </div>
   );
-};
+}

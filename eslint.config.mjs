@@ -1,4 +1,6 @@
 import js from "@eslint/js";
+import prettierConfig from "eslint-config-prettier";
+import prettier from "eslint-plugin-prettier";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import globals from "globals";
@@ -40,8 +42,15 @@ export default [
     plugins: {
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
+      "prettier": prettier,
     },
     rules: {
+      // 禁用与 Prettier 冲突的格式化规则
+      ...prettierConfig.rules,
+
+      // Prettier 集成
+      "prettier/prettier": "error",
+
       // React Hooks 规则
       ...reactHooks.configs.recommended.rules,
 
@@ -50,33 +59,6 @@ export default [
         "warn",
         { allowConstantExport: true },
       ],
-
-      // 格式化相关规则
-      quotes: ["error", "single"],
-      semi: ["error", "always"],
-      "comma-dangle": ["error", "never"],
-      "no-trailing-spaces": "error",
-      "eol-last": ["error", "always"],
-      "object-curly-spacing": ["error", "always"],
-      "array-bracket-spacing": ["error", "never"],
-      "space-before-function-paren": ["error", "never"],
-      "keyword-spacing": "error",
-      "space-infix-ops": "error",
-      "comma-spacing": ["error", { before: false, after: true }],
-      "key-spacing": ["error", { afterColon: true }],
-      "max-len": [
-        "error",
-        {
-          code: 120,
-          ignoreStrings: true, // 忽略字符串
-          ignoreTemplateLiterals: true, // 忽略模板字符串
-          ignoreUrls: true, // 忽略 URL
-          ignoreComments: true, // 忽略注释
-        },
-      ],
-      "linebreak-style": "off", // Windows/Unix 兼容性
-      'newline-per-chained-call': ['error', { ignoreChainWithDepth: 2 }],
-      'dot-location': ['error', 'property'],
 
       // 代码质量相关规则
       "no-console": "off",
