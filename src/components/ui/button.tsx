@@ -1,31 +1,8 @@
-import { cva, type VariantProps } from 'class-variance-authority';
+import { type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
 
 import { cn } from '@/lib/utils';
-import styles from './button.module.scss';
-
-const buttonVariants = cva(styles.buttonBase, {
-  variants: {
-    variant: {
-      default: styles.variantDefault,
-      destructive: styles.variantDestructive,
-      outline: styles.variantOutline,
-      secondary: styles.variantSecondary,
-      ghost: styles.variantGhost,
-      link: styles.variantLink
-    },
-    size: {
-      default: styles.sizeDefault,
-      sm: styles.sizeSm,
-      lg: styles.sizeLg,
-      icon: styles.sizeIcon
-    }
-  },
-  defaultVariants: {
-    variant: 'default',
-    size: 'default'
-  }
-});
+import { buttonVariants } from './button.variants';
 
 const Button = React.forwardRef<
   HTMLButtonElement,
@@ -43,4 +20,5 @@ const Button = React.forwardRef<
 
 Button.displayName = 'Button';
 
-export { Button, buttonVariants };
+export { Button };
+export type { VariantProps };
