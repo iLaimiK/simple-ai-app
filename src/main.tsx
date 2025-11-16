@@ -1,4 +1,4 @@
-import '@/styles/index.css';
+import '@/styles/index.scss';
 import '@unocss/reset/normalize.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';

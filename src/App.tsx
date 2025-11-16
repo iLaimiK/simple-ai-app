@@ -3,6 +3,7 @@ import { ArrowRightIcon, GlobeIcon, Loader2Icon, SquareIcon } from 'lucide-react
 import { useRef } from 'react';
 
 import type { ChatMessage } from '@/types';
+import styles from './App.module.scss';
 import { MessageItem } from './components/MessageItem';
 import { ssePost } from './lib/sse';
 import { cn } from './lib/utils';
@@ -116,48 +117,38 @@ function App() {
   const isWelcome = state.messages.length === 0;
 
   return (
-    <main className={cn('pb-28', isWelcome && 'flex h-screen flex-col justify-center')}>
+    <main className={cn(styles.main, isWelcome && styles.mainWelcome)}>
       {/* 标题 */}
-      <section className='sticky left-0 top-0'>
-        <h1 className='bg-background relative mx-auto p-4 text-3xl font-medium md:w-3xl'>
-          {isWelcome ? '有什么需要帮忙的喵？' : 'Neko'}
-        </h1>
+      <section className={styles.header}>
+        <h1 className={styles.title}>{isWelcome ? '有什么需要帮忙的喵？' : 'Neko'}</h1>
       </section>
 
       {/* 聊天消息 */}
-      <section className='mx-auto flex w-full flex-col justify-between px-4 pb-6 leading-relaxed md:w-3xl'>
-        <div className='flex flex-1 flex-col gap-4'>
+      <section className={styles.messagesSection}>
+        <div className={styles.messagesList}>
           {state.messages.map((message, index) => (
             <MessageItem key={index} message={message} />
           ))}
         </div>
 
-        {state.error && <div className='mt-4 rounded bg-red-50 p-4 py-3 text-sm text-red-500'>{state.error}</div>}
+        {state.error && <div className={styles.errorMessage}>{state.error}</div>}
       </section>
 
       {/* 底部输入框 */}
-      <section
-        className={cn(
-          'bg-background w-full p-4 pt-0 md:w-3xl',
-          isWelcome ? 'relative mx-auto' : 'fixed bottom-0 left-1/2 -translate-x-1/2'
-        )}
-      >
-        <div className='relative flex flex-col gap-2 rounded-xl border-2 pb-10 bg-background focus-within:border-primary'>
+      <section className={cn(styles.inputSection, isWelcome ? styles.inputSectionWelcome : styles.inputSectionFixed)}>
+        <div className={styles.inputContainer}>
           <input
             ref={input}
-            className='h-11 px-4 outline-none'
+            className={styles.inputField}
             autoFocus
             value={state.input}
             onChange={e => (state.input = e.target.value)}
             disabled={state.isConnecting || state.isReplying}
             placeholder='在这里输入喵~'
           />
-          <div className='absolute bottom-2 left-2 select-none'>
+          <div className={styles.bottomToolbar}>
             <div
-              className={cn(
-                'flex cursor-pointer items-center gap-1 rounded-md p-1 px-2 text-sm hover:bg-gray-100',
-                state.isEnabledWebSearch && 'bg-blue-100 text-blue-600 hover:bg-blue-100'
-              )}
+              className={cn(styles.websearchButton, state.isEnabledWebSearch && styles.websearchButtonActive)}
               onClick={() => (state.isEnabledWebSearch = !state.isEnabledWebSearch)}
             >
               <GlobeIcon size={16} />
@@ -165,16 +156,15 @@ function App() {
             </div>
           </div>
 
-          <div
-            className={cn(
-              'absolute bottom-2 right-2 flex-center rounded-full bg-black p-1.5 text-white cursor-pointer',
-              state.isConnecting && 'pointer-events-none bg-neutral-500'
-            )}
-            onClick={handleSend}
-          >
-            {state.isConnecting && <Loader2Icon size={16} className='animate-spin' />}
-            {state.isReplying && <SquareIcon size={16} />}
-            {!state.isConnecting && !state.isReplying && <ArrowRightIcon size={16} className='rotate--90' />}
+          <div className={styles.sendButtonWrapper}>
+            <div
+              className={cn(styles.sendButton, state.isConnecting && styles.sendButtonDisabled)}
+              onClick={handleSend}
+            >
+              {state.isConnecting && <Loader2Icon size={16} className={styles.iconSpin} />}
+              {state.isReplying && <SquareIcon size={16} />}
+              {!state.isConnecting && !state.isReplying && <ArrowRightIcon size={16} className={styles.iconRotate} />}
+            </div>
           </div>
         </div>
       </section>
