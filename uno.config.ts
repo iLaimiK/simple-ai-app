@@ -50,6 +50,8 @@ export default defineConfig({
     }),
     presetTypography(),
     presetWebFonts({
+      // 使用 bunny.net CDN 替代 Google Fonts
+      provider: "bunny",
       fonts: {
         sans: "DM Sans",
         serif: "DM Serif Display",
