@@ -109,7 +109,8 @@ async function sseHandler(req: Request, res: Response) {
   res.flushHeaders();
 
   // 如果客户端断开链接，则取消模型请求
-  req.on('close', () => {
+  req.on('end', () => {
+    console.log('客户端连接关闭，中止请求');
     // 这会让下面的 for await 循环抛出 Error: Aborted 异常
     abortController.abort();
   });

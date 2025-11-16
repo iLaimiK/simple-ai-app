@@ -1,5 +1,20 @@
 import { ChatOpenAI } from '@langchain/openai';
 
+// 抑制 token 计算相关的警告日志
+// 因为 token 计算失败不影响核心功能，会自动回退到近似计数
+const originalConsoleWarn = console.warn;
+console.warn = (...args: any[]) => {
+  const message = args[0]?.toString() || '';
+  // 过滤掉 token 计算失败的警告
+  if (
+    message.includes('Failed to calculate number of tokens') ||
+    message.includes('falling back to approximate count')
+  ) {
+    return;
+  }
+  originalConsoleWarn.apply(console, args);
+};
+
 // 调用大模型 API 必要参数
 const API_KEY = process.env.API_KEY;
 const BASE_URL = process.env.BASE_URL;
@@ -24,7 +39,16 @@ export const llm = new ChatOpenAI({
       'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
       'Cache-Control': 'no-cache',
       Pragma: 'no-cache'
-    }
+    },
+    // 增加超时时间，避免连接过早断开
+    timeout: 60000
   },
-  streaming: true
+  streaming: true,
+  // 禁用自动 token 计数以避免额外的 API 调用
+  // 这样可以减少网络请求，避免 ECONNRESET 错误
+  cache: false,
+  // 设置最大重试次数
+  maxRetries: 3,
+  // 设置请求超时
+  timeout: 60000
 });

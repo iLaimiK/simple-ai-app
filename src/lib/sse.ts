@@ -1,5 +1,5 @@
 export type SSEOptions = {
-  params: Record<string, string>;
+  params: Record<string, any>;
   signal: AbortSignal;
 };
 
@@ -89,6 +89,7 @@ export function ssePost<T>(path: string, options: SSEOptions) {
       signal
     })
       .then(async res => {
+        // 这里拿到响应头，理论上要判断是不是SSE响应头
         if (!res.ok) {
           const text = (await res.text()) || res.statusText;
           throw new Error(text);
@@ -98,6 +99,7 @@ export function ssePost<T>(path: string, options: SSEOptions) {
         return res.body;
       })
       .then(async body => {
+        // 这里拿到响应体
         if (!body) {
           throw new Error('No body present');
         }

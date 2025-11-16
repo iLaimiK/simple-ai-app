@@ -1,7 +1,8 @@
-import type { ChatMessage } from '@/types';
 import { useKeyPress, useMount, useReactive } from 'ahooks';
-import { ArrowRightIcon, Loader2Icon, SquareIcon } from 'lucide-react';
+import { ArrowRightIcon, GlobeIcon, Loader2Icon, SquareIcon } from 'lucide-react';
 import { useRef } from 'react';
+
+import type { ChatMessage } from '@/types';
 import { MessageItem } from './components/MessageItem';
 import { ssePost } from './lib/sse';
 import { cn } from './lib/utils';
@@ -12,6 +13,7 @@ function App() {
     input: '',
     isConnecting: false,
     isReplying: false,
+    isEnabledWebSearch: false,
     error: ''
   });
 
@@ -72,7 +74,8 @@ function App() {
       const stream = await ssePost<ChatMessage>('/api/sse', {
         signal: abortController.current.signal,
         params: {
-          query: state.input.trim()
+          query: state.input.trim(),
+          websearch: state.isEnabledWebSearch
         }
       });
 
@@ -149,6 +152,19 @@ function App() {
             disabled={state.isConnecting || state.isReplying}
             placeholder='在这里输入喵~'
           />
+          <div className='absolute bottom-2 left-2 select-none'>
+            <div
+              className={cn(
+                'flex cursor-pointer items-center gap-1 rounded-md p-1 px-2 text-sm hover:bg-gray-100',
+                state.isEnabledWebSearch && 'bg-blue-100 text-blue-600 hover:bg-blue-100'
+              )}
+              onClick={() => (state.isEnabledWebSearch = !state.isEnabledWebSearch)}
+            >
+              <GlobeIcon size={16} />
+              <span>联网搜索</span>
+            </div>
+          </div>
+
           <div
             className={cn(
               'absolute bottom-2 right-2 flex-center rounded-full bg-black p-1.5 text-white cursor-pointer',

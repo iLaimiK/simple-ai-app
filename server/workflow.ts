@@ -23,14 +23,9 @@ export async function* stream(options: StreamOptions): AsyncGenerator<ChatMessag
   if (websearch) {
     // 1. 生成搜索关键词
     const keywords = await llm
-      .invoke(
-        [
-          ...context,
-          new HumanMessage(query),
-          new HumanMessage(`根据当前问题和历史消息，设计一组简介、精准的搜索关键词，用空格分隔。`)
-        ],
-        { signal }
-      )
+      .invoke([...context, new HumanMessage(`根据当前问题和历史消息，设计一组简洁、精准的搜索关键词，用空格分隔。`)], {
+        signal
+      })
       .then(res => res.content.toString());
 
     const keywordsMessage: ChatMessage = {
