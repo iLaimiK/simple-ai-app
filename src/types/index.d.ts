@@ -17,17 +17,21 @@ export type ChatMessage =
       };
     }
   | {
-      type: 'websearch-keywords';
+      type: 'tool_call';
       partial?: false;
       payload: {
-        keywords: string;
+        id: string;
+        name: string;
+        args: Record<string, any>;
       };
     }
   | {
-      type: 'websearch-results';
+      type: 'tool_result';
       partial?: false;
       payload: {
-        searchResults: WebsearchResult;
+        tool_call_id: string;
+        name: string;
+        content: string;
       };
     };
 

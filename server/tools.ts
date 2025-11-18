@@ -1,8 +1,17 @@
+import { tool } from '@langchain/core/tools';
+import { z } from 'zod';
+
+type Args = {
+  keywords: string;
+};
+
 /**
  * 联网搜索函数
  * 使用 Bing 的 rss 响应接口，进行简单的正则提取
  */
-export async function websearch(keywords: string) {
+export async function websearch(args: Args) {
+  const { keywords } = args;
+
   const res = await fetch(`https://www.bing.com/search?format=rss&q=${encodeURIComponent(keywords)}`);
 
   const rss = await res.text();
@@ -27,3 +36,16 @@ export async function websearch(keywords: string) {
 
   return results.filter(result => result !== null);
 }
+
+/**
+ * 用 langchain 的 tool 封装一下才能配合模型使用
+ */
+const websearchTool = tool(websearch, {
+  description: '通过网络搜索获取信息，输入关键词，返回相关的搜索结果列表。',
+  name: 'websearch',
+  schema: z.object({
+    keywords: z.string().describe('搜索关键词，用空格分隔。')
+  })
+});
+
+export const tools = [websearchTool];

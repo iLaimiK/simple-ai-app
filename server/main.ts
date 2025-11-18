@@ -1,8 +1,11 @@
-import { AIMessageChunk, HumanMessage } from '@langchain/core/messages';
 import type { Request, Response } from 'express';
 import express from 'express';
+
+import { AIMessageChunk, HumanMessage, ToolMessage } from '@langchain/core/messages';
+
+import * as agent from './agent.ts';
 import { context } from './context.ts';
-import * as workflow from './workflow.ts';
+import { isToolCall } from './utils.ts';
 
 // 和前端共享的类型
 import type { ChatMessage } from '../src/types/index.d.ts';
@@ -30,22 +33,17 @@ app.get('/history', (_req: Request, res: Response) => {
     }
 
     if (message instanceof AIMessageChunk) {
-      const content = message.content.toString();
-
-      if (content.startsWith('正在搜索: ')) {
-        messages.push({
-          type: 'websearch-keywords',
-          payload: {
-            keywords: content.slice(5)
-          }
-        });
-      } else if (content.startsWith('搜索结果: ')) {
-        messages.push({
-          type: 'websearch-results',
-          payload: {
-            searchResults: JSON.parse(content.slice(5))
-          }
-        });
+      if (isToolCall(message)) {
+        for (const item of message.tool_calls) {
+          messages.push({
+            type: 'tool_call',
+            payload: {
+              id: item.id!,
+              name: item.name,
+              args: item.args
+            }
+          });
+        }
       } else {
         messages.push({
           type: 'assistant',
@@ -54,6 +52,17 @@ app.get('/history', (_req: Request, res: Response) => {
           }
         });
       }
+    }
+
+    if (message instanceof ToolMessage) {
+      messages.push({
+        type: 'tool_result',
+        payload: {
+          tool_call_id: message.tool_call_id!,
+          name: message.name!,
+          content: message.content.toString()
+        }
+      });
     }
   }
 
@@ -79,25 +88,21 @@ app.post('/sse', sseHandler);
 
 async function sseHandler(req: Request, res: Response) {
   let query = '';
-  let websearch = false;
 
   if (req.method === 'GET') {
     query = req.query.query as unknown as string;
-    websearch = req.query.websearch === 'true';
   }
 
   if (req.method === 'POST') {
     query = req.body.query;
-    websearch = req.body.websearch;
   }
 
   const abortController = new AbortController();
 
-  // 执行 workflow
-  const stream = workflow.stream({
+  // 执行 agent
+  const stream = agent.stream({
     signal: abortController.signal,
-    query,
-    websearch
+    query
   });
 
   // 设置 SSE 响应头

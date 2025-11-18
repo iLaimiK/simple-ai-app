@@ -43,12 +43,5 @@ export const llm = new ChatOpenAI({
     // 增加超时时间，避免连接过早断开
     timeout: 60000
   },
-  streaming: true,
-  // 禁用自动 token 计数以避免额外的 API 调用
-  // 这样可以减少网络请求，避免 ECONNRESET 错误
-  cache: false,
-  // 设置最大重试次数
-  maxRetries: 3,
-  // 设置请求超时
-  timeout: 60000
+  streaming: true
 });
