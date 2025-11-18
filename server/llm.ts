@@ -39,7 +39,13 @@ export const llm = new ChatOpenAI({
       'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
       'Cache-Control': 'no-cache',
       Pragma: 'no-cache'
-    }
+    },
+    timeout: 60000
   },
-  streaming: true
+  streaming: true,
+  // 禁用自动 token 计数以避免额外的 API 调用
+  // 这样可以减少网络请求，避免 ECONNRESET 错误
+  cache: false,
+  maxRetries: 3,
+  timeout: 60000
 });
