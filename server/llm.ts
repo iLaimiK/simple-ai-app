@@ -39,9 +39,7 @@ export const llm = new ChatOpenAI({
       'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
       'Cache-Control': 'no-cache',
       Pragma: 'no-cache'
-    },
-    // 增加超时时间，避免连接过早断开
-    timeout: 60000
+    }
   },
   streaming: true
 });

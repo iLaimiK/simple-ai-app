@@ -41,10 +41,14 @@ export async function websearch(args: Args) {
  * 用 langchain 的 tool 封装一下才能配合模型使用
  */
 const websearchTool = tool(websearch, {
-  description: '通过网络搜索获取信息，输入关键词，返回相关的搜索结果列表。',
+  description: '通过网络搜索获取信息',
   name: 'websearch',
   schema: z.object({
-    keywords: z.string().describe('搜索关键词，用空格分隔。')
+    keywords: z
+      .string()
+      .describe(
+        '搜索查询字符串。可以是简单关键词组合，也可以使用 Bing 搜索运算符构造精确查询。例如："rust programming" +cargo，或 "machine learning" +python +tutorial'
+      )
   })
 });
 
