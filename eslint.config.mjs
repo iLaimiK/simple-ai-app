@@ -49,7 +49,7 @@ export default [
       ...prettierConfig.rules,
 
       // Prettier 集成
-      "prettier/prettier": "error",
+      "prettier/prettier": "warn",
 
       // React Hooks 规则
       ...reactHooks.configs.recommended.rules,

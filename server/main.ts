@@ -70,7 +70,7 @@ app.get('/history', (_req: Request, res: Response) => {
 });
 
 /**
- * 全量上下文查询接口
+ * 当前上下文查询接口
  */
 app.get('/context', (_req: Request, res: Response) => {
   res.json(context);

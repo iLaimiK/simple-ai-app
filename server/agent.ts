@@ -1,9 +1,8 @@
-import { HumanMessage } from '@langchain/core/messages';
+import { HumanMessage, ToolMessage } from '@langchain/core/messages';
 
 import { context } from './context';
-import { llm } from './llm';
-import { tools } from './tools';
-import { executeToolCalls, isToolCall } from './utils';
+import { createGraph } from './graph';
+import { isToolCall } from './utils';
 
 // 和前端共享的类型
 import type { ChatMessage } from '../src/types/index';
@@ -16,67 +15,71 @@ export type StreamOptions = {
 export async function* stream(options: StreamOptions): AsyncGenerator<ChatMessage> {
   const { signal, query } = options;
 
-  // 给模型绑定可用工具
-  const llmWithTools = llm.bindTools(tools);
-
   // 添加用户消息到上下文
   context.push(new HumanMessage(query));
 
-  // Agent Loop
-  while (true) {
-    // 调用模型
-    // TODO: 简单起见，这里用的是同步调用(invoke)，应改造为流式调用(stream)
-    const response = await llmWithTools.invoke(context, { signal, tool_choice: 'auto' });
+  // 创建新的 graph 实例
+  const graph = createGraph();
 
-    // 判断是否为工具调用
-    if (isToolCall(response)) {
-      // 通知前端展示工具调用
-      for (const item of response.tool_calls) {
-        yield {
-          type: 'tool_call',
-          payload: {
-            id: item.id!,
-            name: item.name,
-            args: item.args
+  // 启动 graph，并传入历史上下文
+  const stream = await graph.stream({ messages: context }, { signal });
+
+  // 观测 graph 的状态更新和自定义消息
+  for await (const output of stream) {
+    // tips: output 包含了 graph 每个节点的返回值
+    // output = {
+    //   <node_name>: <return_value>,
+    //   <node_name>: <return_value>,
+    //   ...
+    // }
+    // 遍历节点
+    for (const [node, value] of Object.entries(output)) {
+      // 遍历节点返回的 messages 字段
+      for (const message of value.messages || []) {
+        // start 节点可能输出工具调用或者模型回复
+        if (node === 'start') {
+          // 添加模型回复到上下文
+          context.push(message);
+
+          if (isToolCall(message)) {
+            // 通知前端有工具调用
+            for (const item of message.tool_calls) {
+              yield {
+                type: 'tool_call',
+                payload: {
+                  id: item.id!,
+                  name: item.name,
+                  args: item.args
+                }
+              };
+            }
+          } else {
+            // 通知前端有模型回复
+            yield {
+              type: 'assistant',
+              payload: {
+                content: message.content.toString()
+              }
+            };
           }
-        };
+        }
+
+        // tools 节点输出工具调用结果
+        if (node === 'tools' && message instanceof ToolMessage) {
+          // 添加工具调用结果到上下文
+          context.push(message);
+
+          // 通知前端有工具调用结果
+          yield {
+            type: 'tool_result',
+            payload: {
+              tool_call_id: message.tool_call_id!,
+              name: message.name!,
+              content: message.content.toString()
+            }
+          };
+        }
       }
-
-      // 添加工具调用到上下文
-      context.push(response);
-
-      // 执行工具调用
-      const toolMessages = await executeToolCalls(tools, response.tool_calls);
-
-      // 添加工具调用结果到上下文
-      context.push(...toolMessages);
-
-      // 通知前端展示工具调用结果
-      for (const item of toolMessages) {
-        yield {
-          type: 'tool_result',
-          payload: {
-            tool_call_id: item.tool_call_id!,
-            name: item.name!,
-            content: item.content.toString()
-          }
-        };
-      }
-
-      continue;
     }
-
-    // 返回模型回复
-    yield {
-      type: 'assistant',
-      partial: false,
-      payload: {
-        content: response.content.toString()
-      }
-    };
-
-    // 添加模型回复到上下文
-    context.push(response);
-    break;
   }
 }

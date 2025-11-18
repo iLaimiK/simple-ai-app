@@ -1,9 +1,9 @@
 {
   "name": "ai-app",
-  "version": "1.2.0",
+  "version": "1.5.0",
   "packageManager": "pnpm@10.22.0",
   "author": "yoyo514",
-  "description": "通俗易懂AI应用开发",
+  "description": "A chatbot",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -53,6 +53,7 @@
   },
   "dependencies": {
     "@langchain/core": "^1.0.5",
+    "@langchain/langgraph": "^1.0.2",
     "@langchain/openai": "^1.1.1",
     "@radix-ui/react-slot": "^1.2.4",
     "@unocss/reset": "^66.5.6",
