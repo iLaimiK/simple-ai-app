@@ -5,6 +5,8 @@ import remarkGfm from 'remark-gfm';
 
 import { cn } from '@/lib/utils';
 import type { ChatMessage, WebsearchResult } from '@/types';
+
+import 'github-markdown-css/github-markdown.css';
 import styles from './MessageItem.module.scss';
 
 export type MessageItemProps = {
@@ -22,11 +24,9 @@ export function MessageItem(props: MessageItemProps) {
 
       {message.type === 'assistant' && <AssistantMessage {...message.payload} />}
 
-      {message.type === 'websearch-keywords' && <WebsearchKeywordsMessage keywords={message.payload.keywords} />}
+      {message.type === 'tool_call' && message.payload.name === 'websearch' && <ToolCallMessage {...message.payload} />}
 
-      {message.type === 'websearch-results' && (
-        <WebsearchResultsMessage searchResults={message.payload.searchResults} />
-      )}
+      {message.type === 'tool_result' && <ToolResultMessage {...message.payload} />}
     </div>
   );
 }
@@ -41,10 +41,34 @@ function AssistantMessage(props: { content: string }) {
   const { content } = props;
 
   return (
-    <div className={styles.assistantMessage}>
+    <div className='markdown-body'>
       <Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown>
     </div>
   );
+}
+
+function ToolCallMessage(props: { id: string; name: string; args: Record<string, any> }) {
+  const { name, args } = props;
+
+  if (name === 'websearch') {
+    return <WebsearchKeywordsMessage keywords={args.keywords} />;
+  }
+
+  // TODO: 其他工具调用展示
+
+  return null;
+}
+
+function ToolResultMessage(props: { tool_call_id: string; name: string; content: string }) {
+  const { name, content } = props;
+
+  if (name === 'websearch') {
+    return <WebsearchResultsMessage searchResults={JSON.parse(content) as WebsearchResult} />;
+  }
+
+  // TODO: 其他工具结果展示
+
+  return null;
 }
 
 function WebsearchKeywordsMessage(props: { keywords: string }) {

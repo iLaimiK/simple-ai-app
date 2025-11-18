@@ -14,7 +14,7 @@ function App() {
     input: '',
     isConnecting: false,
     isReplying: false,
-    isEnabledWebSearch: false,
+    isEnabledWebSearch: true,
     error: ''
   });
 
@@ -75,8 +75,8 @@ function App() {
       const stream = await ssePost<ChatMessage>('/api/sse', {
         signal: abortController.current.signal,
         params: {
-          query: state.input.trim(),
-          websearch: state.isEnabledWebSearch
+          query: state.input.trim()
+          // websearch: state.isEnabledWebSearch
         }
       });
 
@@ -130,13 +130,13 @@ function App() {
             <MessageItem key={index} message={message} />
           ))}
         </div>
-
+        {/* 错误提示 */}
         {state.error && <div className={styles.errorMessage}>{state.error}</div>}
       </section>
 
       {/* 底部输入框 */}
       <section className={cn(styles.inputSection, isWelcome ? styles.inputSectionWelcome : styles.inputSectionFixed)}>
-        <div className={styles.inputContainer}>
+        <div className={cn(styles.inputContainer)}>
           <input
             ref={input}
             className={styles.inputField}
@@ -147,22 +147,22 @@ function App() {
             placeholder='在这里输入喵~'
           />
           <div className={styles.bottomToolbar}>
-            <div
-              className={cn(styles.websearchButton, state.isEnabledWebSearch && styles.websearchButtonActive)}
-              onClick={() => (state.isEnabledWebSearch = !state.isEnabledWebSearch)}
-            >
+            <div className={cn(styles.websearchButton, state.isEnabledWebSearch && styles.websearchButtonActive)}>
               <GlobeIcon size={16} />
               <span>联网搜索</span>
             </div>
           </div>
 
-          <div className={styles.sendButtonWrapper}>
+          <div className={cn(styles.sendButtonWrapper)}>
             <div
               className={cn(styles.sendButton, state.isConnecting && styles.sendButtonDisabled)}
               onClick={handleSend}
             >
+              {/* 正在连接图标 */}
               {state.isConnecting && <Loader2Icon size={16} className={styles.iconSpin} />}
+              {/* 中断图标 */}
               {state.isReplying && <SquareIcon size={16} />}
+              {/* 发送图标 */}
               {!state.isConnecting && !state.isReplying && <ArrowRightIcon size={16} className={styles.iconRotate} />}
             </div>
           </div>

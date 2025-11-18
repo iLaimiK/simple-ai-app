@@ -81,7 +81,7 @@
 
 // 联网搜索按钮
 .websearchButton {
-  @apply flex cursor-pointer flex-y-center gap-1 rounded-md p-1 px-2 text-sm;
+  @apply flex cursor-pointer flex-y-center gap-1 rounded-md p-1 px-2 text-sm, cursor-not-allowed;
   transition: background-color 0.2s;
 
   &:hover {
