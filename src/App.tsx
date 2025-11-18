@@ -3,10 +3,11 @@ import { ArrowRightIcon, GlobeIcon, Loader2Icon, SquareIcon } from 'lucide-react
 import { useRef } from 'react';
 
 import type { ChatMessage } from '@/types';
-import styles from './App.module.scss';
 import { MessageItem } from './components/MessageItem';
 import { ssePost } from './lib/sse';
 import { cn } from './lib/utils';
+
+import styles from './App.module.scss';
 
 function App() {
   const state = useReactive({
