@@ -2,6 +2,13 @@
 
 带 Web UI 界面的聊天机器人。仅用于人工智能应用开发学习
 
+## Feature
+
+- 使用免费的 Bing 搜索接口
+- 基础的 Agentic 范式实现
+- 基础的聊天上下文管理
+- 前端 Markdown 渲染、自定义消息渲染
+
 ## 环境
 
 此代码库包含完整的前后端，为了避免引入复杂的环境配置，统一采用前端技术栈
@@ -37,3 +44,9 @@ npm run dev
 npm run dev:ui
 npm run dev:server
 ```
+
+## 调试说明
+
+在浏览器访问下面的接口查看当前上下文:
+
+<http://localhost:5173/api/context>
